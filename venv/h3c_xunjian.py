@@ -4,19 +4,6 @@ import paramiko
 import time
 import re
 
-class Logger(object):
-    def __init__(self, fileN='Default.log'):
-        self.terminal = sys.stdout
-        self.log = open(fileN, 'a')
-
-    def write(self, message):
-        '''print实际相当于sys.stdout.write'''
-        self.terminal.write(message)
-        self.log.write(message)
-
-    def flush(self):
-        pass
-
 output_file = 'E:\\iplist1.txt'    #远程服务器地址
 command_file = 'E:\\command.txt'   #巡检命令
 file = open(output_file,"r",encoding='UTF-8')
@@ -47,5 +34,4 @@ for ip in all:
         results = results.decode()
         print(results)   #打印标准输出
         print("-"*70)
-        #results = Logger('E:\\xunjian.txt')
     ssh.close()
