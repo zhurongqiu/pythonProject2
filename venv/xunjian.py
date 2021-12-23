@@ -3,6 +3,7 @@ import sys
 import paramiko
 import time
 import re
+import os
 
 class Logger(object):
     def __init__(self, fileN='Default.log'):
@@ -18,8 +19,8 @@ class Logger(object):
         pass
 
 if __name__ == "__main__":
-    output_file = 'E:\\iplist.txt'    #远程服务器地址
-    command_file = 'E:\\command1.txt'   #巡检命令
+    output_file = 'E:\\test\\iplist.txt'    #远程服务器地址
+    command_file = 'E:\\test\\command1.txt'   #巡检命令
     file = open(output_file,"r",encoding='UTF-8')
     print(file)
     all = file.readlines()
@@ -30,21 +31,29 @@ if __name__ == "__main__":
         port = 22     #端口
         username = "admin"   #用户名
         password = "admin"   #密码
-        paramiko.util.log_to_file('E:\\ssh_connect_last.log')    #创建SSH连接日志文（只保留前一次连接的详细日志 以前的日志会自动被覆盖）
+        paramiko.util.log_to_file('E:\\test\\ssh_connect_last.log')    #创建SSH连接日志文（只保留前一次连接的详细日志 以前的日志会自动被覆盖）
         ssh = paramiko.SSHClient()
         #ssh.load_system_host_keys()     #读取know_host
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())   #允许连接不在know_hosts文件中的主机
         ssh.connect(hostname=ip, port=port, username=username, password=password)   #建立SSH连接并执行命令
         command = open(command_file, "r")
-        xunjian = command.readlines()
-        for xunjian_command in xunjian:
-            stdin, stdout, stderr = ssh.exec_command(xunjian_command)
-            #print(xunjian_command)     #可打印命令#
-            result = stdout.read()
-            time.sleep(1)
-            #results = result.replace(b'\r',b'')
-            #results = result.decode()
-            print(result.decode())   #打印标准输出
-            print("-"*70)
-            sys.stdout = Logger('E:\\result.txt')
+        #xunjian = command.readlines()
+        #print (xunjian)
+        #for xunjian_command in xunjian:
+        with command as tttext:
+            xunjian_command_list = tttext.readlines()
+            #xunjian_command = xunjian_command.rstrip("\n")
+            for xunjian_command in xunjian_command_list:
+                stdin, stdout, stderr = ssh.exec_command(xunjian_command)
+                print(xunjian_command)     #可打印命令#
+                result = stdout.read()
+                time.sleep(.1)
+                #results = result.replace(b'\r',b'')
+                #results = result.decode()
+                print(result.decode())   #打印标准输出
+                print("-"*70)
+                print(ip)
+                sys.stdout = open('E:\\test\\'+ ip +'-巡检信息.txt','a+')
+                result = ''
+        #sys.stdout.flush()
         ssh.close()
